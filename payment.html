@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Stripe Checkout</title>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <style>
+    /* Add your CSS styles here */
+  </style>
+</head>
+<body>
+
+  <!-- Payment button -->
+  <button id="checkout-button">Checkout</button>
+
+  <script src="https://js.stripe.com/v3/"></script>
+  <script>
+    $(document).ready(function() {
+      $('#checkout-button').click(function(event) {
+        // Create a Stripe Checkout session
+        fetch('/create-checkout-session', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({items: [{sku: 'sku_123', quantity: 1}]})
+        })
+        .then(function(response) {
+          return response.json();
+        })
+        .then(function(session) {
+          // Redirect to Checkout
+          return stripe.redirectToCheckout({sessionId: session.id});
+        })
+        .then(function(result) {
+          if (result.error) {
+            // Inform the user if there was an error
+            alert(result.error.message);
+          }
+        })
+        .catch(function(error) {
+          console.error('Error:', error);
+        });
+      });
+    });
+  </script>
+</body>
+</html>
